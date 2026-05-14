@@ -101,3 +101,11 @@ class Calculator extends JFrame implements ActionListener {
         }
     }
 }
+public class CalculatorApp {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Calculator calculator = new Calculator();
+            calculator.setVisible(true);
+        });
+    }
+}

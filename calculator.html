@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculator</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f4f4f8;
+      font-family: Arial, sans-serif;
+    }
+    .calculator {
+      width: 320px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+    .display {
+      width: 100%;
+      height: 80px;
+      border: none;
+      background: #222;
+      color: #fff;
+      font-size: 2rem;
+      text-align: right;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 20px;
+      background: #eceef6;
+    }
+    .button {
+      height: 60px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      background: #ffffff;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    }
+    .button.operator {
+      background: #ff9500;
+      color: #fff;
+    }
+    .button.equal {
+      grid-column: span 2;
+      background: #34c759;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <input type="text" class="display" id="display" readonly>
+    <div class="buttons">
+      <button class="button">7</button>
+      <button class="button">8</button>
+      <button class="button">9</button>
+      <button class="button operator">/</button>
+      <button class="button">4</button>
+      <button class="button">5</button>
+      <button class="button">6</button>
+      <button class="button operator">*</button>
+      <button class="button">1</button>
+      <button class="button">2</button>
+      <button class="button">3</button>
+      <button class="button operator">-</button>
+      <button class="button">0</button>
+      <button class="button">.</button>
+      <button class="button equal">=</button>
+      <button class="button operator">+</button>
+    </div>
+  </div>
+  <script>
+    const display = document.getElementById('display');
+    let firstValue = '';
+    let operator = '';
+    let waitingForSecondValue = false;
+
+    function inputDigit(digit) {
+      if (waitingForSecondValue) {
+        display.value = digit;
+        waitingForSecondValue = false;
+      } else {
+        display.value = display.value === '0' ? digit : display.value + digit;
+      }
+    }
+
+    function handleOperator(nextOperator) {
+      const inputValue = parseFloat(display.value);
+      if (operator && waitingForSecondValue) {
+        operator = nextOperator;
+        return;
+      }
+      if (!firstValue) {
+        firstValue = inputValue;
+      } else if (operator) {
+        const result = operate(operator, firstValue, inputValue);
+        display.value = String(result);
+        firstValue = result;
+      }
+      operator = nextOperator;
+      waitingForSecondValue = true;
+    }
+
+    function operate(operator, a, b) {
+      switch (operator) {
+        case '+': return a + b;
+        case '-': return a - b;
+        case '*': return a * b;
+        case '/': return b === 0 ? 'Error' : a / b;
+      }
+      return b;
+    }
+
+    document.querySelectorAll('.button').forEach(button => {
+      button.addEventListener('click', () => {
+        const value = button.textContent;
+        if ((value >= '0' && value <= '9') || value === '.') {
+          inputDigit(value);
+        } else if (value === '=') {
+          if (operator) {
+            display.value = String(operate(operator, firstValue, parseFloat(display.value)));
+            operator = '';
+            waitingForSecondValue = true;
+          }
+        } else if (value === 'C') {
+          firstValue = '';
+          operator = '';
+          waitingForSecondValue = false;
+          display.value = '';
+        } else {
+          handleOperator(value);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
